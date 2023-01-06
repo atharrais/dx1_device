@@ -1,10 +1,18 @@
+/*
+ * Copyright (c) 2023, ATHARRAIS LLC. All rights Reserved
+ */
 #include <stdio.h>
 #include <stdbool.h>
 #include <unistd.h>
 
-
-void app_main(void)
-{
+/**
+ * @brief Application main entry point
+ *
+ * @description Main entry point to the DX-1 device application.
+ *
+ * @author Robert R Murrell
+ */
+void app_main(void) {
 	// Enable everything for MPU and such
 	// Read flash and see if we are in factory mode
 		// Start Bluetooth for app setup
