@@ -21,39 +21,43 @@
  */
 
 /**
- *
+ * @brief globals.h
  */
 
+#pragma once
+
+#ifndef ATH_GLOBALS_H_
+#define ATH_GLOBALS_H_
+
+#include <stdio.h>
+#include <stdbool.h>
+#include <unistd.h>
+
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/event_groups.h"
+#include "freertos/semphr.h"
+
+#include "storage.h"
 #include "wifi.h"
+#include "features.h"
 
-esp_err_t ath_wifi_initi(wifi_init_config_t* config, wifi_mode_t mode) {
-	ATH_APP_INFO("Wifi initializing...");
-	esp_err_t err = esp_netif_init();
+/**
+ * @brief Structure to hold global application state.
+ *
+ * @details Holds global application state across FreeRTOS threads and application
+ *          states.
+ */
+typedef struct {
+	/*@{*/
+	uint32_t featureFlags;		/**< Feature flags from NVS Flash. */
+	ath_wifi_config_s wifi;	/**< Wifi Configuration for Atharrais. */
+	/*@}*/
+} ath_context_s;
 
-	err = esp_event_loop_create_default();
-	if(err != ESP_OK) return err;
+/**
+ * @brief Static global instance of the Atharrais appliction configuration.
+ */
+static ath_context_s* ATH_APP_CONTEXT = &(ath_context_s){};
 
-	esp_netif_t* sta_netif = esp_netif_create_default_wifi_sta();
-	if(sta_netif == NULL) return ESP_FAIL;
-
-	esp_netif_t* ap_netif = esp_netif_create_default_wifi_ap();
-	if(ap_netif == NULL) return ESP_FAIL;
-
-	err = esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &wifi_event_handler, NULL);
-	if(err != ESP_OK) return err;
-	err = esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &ip_event_handler, NULL);
-	if(err != ESP_OK) return err;
-
-	err = esp_wifi_init(config);
-
-	switch(mode) {
-	case WIFI_MODE_STA:
-		return ath_wifi_start_sta();
-	case WIFI_MODE_AP:
-		return ath_wifi_start_ap();
-	default:
-		return ath_wifi_start_sta();
-	}
-}
-
-
+#endif /* ATH_GLOBALS_H_ */

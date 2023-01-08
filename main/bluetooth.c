@@ -21,39 +21,28 @@
  */
 
 /**
- *
+ * @brief bluetooth.c
  */
 
-#include "wifi.h"
+#include "bluetooth.h"
 
-esp_err_t ath_wifi_initi(wifi_init_config_t* config, wifi_mode_t mode) {
-	ATH_APP_INFO("Wifi initializing...");
-	esp_err_t err = esp_netif_init();
+esp_err_t ath_bt_initi(ath_bt_config_s* config) {
+	ATH_APP_INFO("Bluetooth initializing...");
 
-	err = esp_event_loop_create_default();
-	if(err != ESP_OK) return err;
+	esp_err_t err = esp_bt_controller_mem_release(config->mode);
+	if(err != ESP_OK)return err;
 
-	esp_netif_t* sta_netif = esp_netif_create_default_wifi_sta();
-	if(sta_netif == NULL) return ESP_FAIL;
+	err = esp_bt_controller_init(&config->config);
+	if(err != ESP_OK)return err;
 
-	esp_netif_t* ap_netif = esp_netif_create_default_wifi_ap();
-	if(ap_netif == NULL) return ESP_FAIL;
+	err = esp_bt_controller_enable(config->controller);
+	if(err != ESP_OK)return err;
 
-	err = esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &wifi_event_handler, NULL);
-	if(err != ESP_OK) return err;
-	err = esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &ip_event_handler, NULL);
-	if(err != ESP_OK) return err;
+	err = esp_blufi_host_and_cb_init(&config->callbacks);
+	if(err != ESP_OK)return err;
 
-	err = esp_wifi_init(config);
+	ATH_BLU_INFO("Blufi API version %04x\n", esp_blufi_get_version());
+	ATH_APP_INFO("Bluetooth initialized.");
 
-	switch(mode) {
-	case WIFI_MODE_STA:
-		return ath_wifi_start_sta();
-	case WIFI_MODE_AP:
-		return ath_wifi_start_ap();
-	default:
-		return ath_wifi_start_sta();
-	}
+	return ESP_OK;
 }
-
-

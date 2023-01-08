@@ -21,39 +21,46 @@
  */
 
 /**
- *
+ * @brief bluetooth.h
  */
 
-#include "wifi.h"
+#ifndef ATH_BLUETOOTH_H_
+#define ATH_BLUETOOTH_H_
 
-esp_err_t ath_wifi_initi(wifi_init_config_t* config, wifi_mode_t mode) {
-	ATH_APP_INFO("Wifi initializing...");
-	esp_err_t err = esp_netif_init();
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-	err = esp_event_loop_create_default();
-	if(err != ESP_OK) return err;
+#include "esp_system.h"
+#include "esp_bt.h"
 
-	esp_netif_t* sta_netif = esp_netif_create_default_wifi_sta();
-	if(sta_netif == NULL) return ESP_FAIL;
+#include "logging.h"
 
-	esp_netif_t* ap_netif = esp_netif_create_default_wifi_ap();
-	if(ap_netif == NULL) return ESP_FAIL;
+#include "globals.h"
 
-	err = esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &wifi_event_handler, NULL);
-	if(err != ESP_OK) return err;
-	err = esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &ip_event_handler, NULL);
-	if(err != ESP_OK) return err;
+/**
+ * @brief Wifi specific configuration details.
+ */
+typedef struct {
+	/*@{*/
+	esp_bt_controller_config_t config;	/**< BT API configuration */
+	esp_bt_mode_t mode;					/**< BT mode */
+	esp_bt_mode_t controller;			/**< BT mode */
+	esp_blufi_callbacks_t callbacks;	/**< BT mode */
+	/*@}*/
+} ath_bt_config_s;
 
-	err = esp_wifi_init(config);
-
-	switch(mode) {
-	case WIFI_MODE_STA:
-		return ath_wifi_start_sta();
-	case WIFI_MODE_AP:
-		return ath_wifi_start_ap();
-	default:
-		return ath_wifi_start_sta();
-	}
+/**
+ * @brief Creates a default wifi configuration.
+ */
+static void ath_bt_gblconfig_create(ath_bt_config_s* config) {
+	esp_bt_controller_config_t _defaults = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
+	config->config = _defaults;
 }
 
+/**
+ * @brief
+ */
+esp_err_t ath_bt_initi(ath_bt_config_s* config);
 
+#endif /* ATH_BLUETOOTH_H_ */

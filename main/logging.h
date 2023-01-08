@@ -21,39 +21,31 @@
  */
 
 /**
- *
+ * @brief logging.h
  */
 
-#include "wifi.h"
+#pragma once
 
-esp_err_t ath_wifi_initi(wifi_init_config_t* config, wifi_mode_t mode) {
-	ATH_APP_INFO("Wifi initializing...");
-	esp_err_t err = esp_netif_init();
+#include "esp_system.h"
+#include "esp_log.h"
 
-	err = esp_event_loop_create_default();
-	if(err != ESP_OK) return err;
+#ifndef ATH_LOGGING_H_
+#define ATH_LOGGING_H_
 
-	esp_netif_t* sta_netif = esp_netif_create_default_wifi_sta();
-	if(sta_netif == NULL) return ESP_FAIL;
+#define ATH_BLU_TAG "BLUETOOTH"
+#define ATH_BLU_INFO(fmt, ...)   ESP_LOGI(ATH_BLU_TAG, fmt, ##__VA_ARGS__)
+#define ATH_BLU_ERROR(fmt, ...)  ESP_LOGE(ATH_BLU_TAG, fmt, ##__VA_ARGS__)
 
-	esp_netif_t* ap_netif = esp_netif_create_default_wifi_ap();
-	if(ap_netif == NULL) return ESP_FAIL;
+#define ATH_WIFI_TAG "WIFI"
+#define ATH_WIFI_INFO(fmt, ...)   ESP_LOGI(ATH_WIFI_TAG, fmt, ##__VA_ARGS__)
+#define ATH_WIFI_ERROR(fmt, ...)  ESP_LOGE(ATH_WIFI_TAG, fmt, ##__VA_ARGS__)
 
-	err = esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &wifi_event_handler, NULL);
-	if(err != ESP_OK) return err;
-	err = esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &ip_event_handler, NULL);
-	if(err != ESP_OK) return err;
+#define ATH_STR_TAG "STORAGE"
+#define ATH_STR_INFO(fmt, ...)   ESP_LOGI(ATH_STR_TAG, fmt, ##__VA_ARGS__)
+#define ATH_STR_ERROR(fmt, ...)  ESP_LOGE(ATH_STR_TAG, fmt, ##__VA_ARGS__)
 
-	err = esp_wifi_init(config);
+#define ATH_APP_TAG "ATHARRAIS"
+#define ATH_APP_INFO(fmt, ...)   ESP_LOGI(ATH_APP_TAG, fmt, ##__VA_ARGS__)
+#define ATH_APP_ERROR(fmt, ...)  ESP_LOGE(ATH_APP_TAG, fmt, ##__VA_ARGS__)
 
-	switch(mode) {
-	case WIFI_MODE_STA:
-		return ath_wifi_start_sta();
-	case WIFI_MODE_AP:
-		return ath_wifi_start_ap();
-	default:
-		return ath_wifi_start_sta();
-	}
-}
-
-
+#endif /* ATH_LOGGING_H_ */

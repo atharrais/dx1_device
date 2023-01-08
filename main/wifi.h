@@ -36,29 +36,62 @@
 #include "esp_wifi.h"
 #include "esp_event.h"
 
+#include "memory.h"
+
+#include "logging.h"
+
 /**
- * @brief
+ * @brief Wifi specific configuration details.
  */
 typedef struct {
 	/*@{*/
 	wifi_init_config_t config;	/**< Wifi API configuration */
 	wifi_mode_t mode;			/**< Wifi mode */
+
 	/*@}*/
-} auth_wifi_config_s;
+} ath_wifi_config_s;
 
-esp_err_t ath_wifi_initi(wifi_init_config_t* config, wifi_mode_t mode = WIFI_MODE_STA);
+/**
+ * @brief Creates a default wifi configuration.
+ */
+static void ath_wifi_gblconfig_create(ath_wifi_config_s* config) {
+	wifi_init_config_t _defaults = WIFI_INIT_CONFIG_DEFAULT();
+	config->config = _defaults;
+}
 
+esp_err_t ath_wifi_initi(wifi_init_config_t* config, wifi_mode_t mode);
 
+/**
+ * @brief
+ */
+static esp_err_t ath_wifi_start_sta() {
+	ATH_APP_INFO("Wifi initialized in sta mode.");
+	esp_err_t err = esp_wifi_set_mode(WIFI_MODE_STA);
+	err = esp_wifi_start();
+	return err;
+}
 
+/**
+ * @brief
+ */
+static esp_err_t ath_wifi_start_ap() {
+	ATH_APP_INFO("Wifi initialized in ap mode.");
+	esp_err_t err = esp_wifi_set_mode(WIFI_MODE_AP);
+	err = esp_wifi_start();
+	return err;
+}
 
-
-
-
+/**
+ * @brief
+ */
 static void wifi_event_handler(void* arg, esp_event_base_t event_base,
                                 int32_t event_id, void* event_data) {
 	//
 }
 
+/**
+ * @brief
+ */
 static void ip_event_handler(void* arg, esp_event_base_t event_base,
                                 int32_t event_id, void* event_data) {
 	//

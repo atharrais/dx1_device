@@ -21,7 +21,7 @@
  */
 
 /**
- * @brief storage.h
+ * @brief storage.c
  */
 
 #include "storage.h"
@@ -43,7 +43,10 @@ void ath_storage_open(ath_storage_s* handle) {
 }
 
 void ath_storage_getFeatureFlags(ath_storage_s* handle, uint32_t* flags) {
-	handle->error = nvs_get_i32(handle->id, handle->namespace, flags);
+	handle->error = nvs_get_u32(handle->id, handle->namespace, flags);
+}
+void ath_storage_setFeatureFlags(ath_storage_s* handle, uint32_t flags) {
+	handle->error = nvs_set_u32(handle->id, handle->namespace, flags);
 }
 
 void ath_storage_close(ath_storage_s* handle) {

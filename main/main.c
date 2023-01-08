@@ -21,7 +21,7 @@
  */
 
 /**
- *
+ * @brief main.c
  */
 
 #include <stdio.h>
@@ -31,27 +31,17 @@
 #include "storage.h"
 #include "features.h"
 
-/**
- * @brief Structure to hold global application state.
- *
- * @details Holds global application state across FreeRTOS threads and application
- *          states.
- */
-typedef struct {
-	/*@{*/
-	uint32_t featureFlags;			/**< Feature flags from NVS Flash. */
-	wifi_init_config_t wifiConfig;	/**< Wifi Configuration for Atharrais. */
-	/*@}*/
-} ath_context_s;
+#include "unboxed.h"
 
-static ath_context_s* GBL_CONST_APP_CONTEXT = &(ath_context_s){
-	.featureFlags = 0
-};
+#include "logging.h"
+#include "globals.h"
 
 /**
  * @brief Starting the application.
  */
 void app_main(void) {
+	ATH_APP_INFO("Welcome to Atharrais DX-1 Module. Starting initialization.");
+
 	// Initialize Storage
 	ESP_ERROR_CHECK(ath_storage_initi());
 
@@ -63,18 +53,21 @@ void app_main(void) {
 		.error = ESP_OK
 	};
 	ath_storage_open(&_storage);
-	ESP_ERROR_CHECK(_storage.error);
-	ath_storage_getFeatureFlags(&_storage, &GBL_CONST_APP_CONTEXT->featureFlags);
-	ESP_ERROR_CHECK(_storage.error);
+	ath_storage_getFeatureFlags(&_storage, &ATH_APP_CONTEXT->featureFlags);
+	if(_storage.error == ESP_ERR_NVS_NOT_FOUND) {
+		ATH_APP_ERROR("No flags in NVS, creating new.");
+		ath_storage_setFeatureFlags(&_storage, ATH_APP_CONTEXT->featureFlags);
+		ESP_ERROR_CHECK(_storage.error);
+	}
+	else ESP_ERROR_CHECK(_storage.error);
 	ath_storage_close(&_storage);
 
-
-
-	if(ath_features_isConfigured(GBL_CONST_APP_CONTEXT->featureFlags)) {
+	if(ath_features_isConfigured(ATH_APP_CONTEXT->featureFlags)) {
 		// Start up the app as normal.
 	}
 	else {
-		// Start in unbox mode and get ready to configure.
-	}
+		ATH_APP_INFO("First time boot, setting up unboxed applet.");
+		//ath_wifi_gblconfig_create(&ATH_APP_CONTEXT->wifi);
 
+	}
 }

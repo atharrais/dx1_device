@@ -21,7 +21,7 @@
  */
 
 /**
- * @brief storage.h, heads storage.c
+ * @brief storage.h
  *
  * @details Atharrais wrapper around the ESP32 NVS libraries for accessing NVS Flash.
  *
@@ -63,6 +63,8 @@ esp_err_t ath_storage_initi();
 void ath_storage_open(ath_storage_s* handle);
 
 void ath_storage_getFeatureFlags(ath_storage_s* handle, uint32_t* flags);
+
+void ath_storage_setFeatureFlags(ath_storage_s* handle, uint32_t flags);
 
 void ath_storage_close(ath_storage_s* handle);
 
