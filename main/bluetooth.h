@@ -27,40 +27,53 @@
 #ifndef ATH_BLUETOOTH_H_
 #define ATH_BLUETOOTH_H_
 
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "esp_system.h"
-#include "esp_bt.h"
-
+#include "globals.h"
 #include "logging.h"
 
-#include "globals.h"
+#include "esp_bt.h"
+#include "esp_blufi_api.h"
 
-/**
- * @brief Wifi specific configuration details.
- */
-typedef struct {
-	/*@{*/
-	esp_bt_controller_config_t config;	/**< BT API configuration */
-	esp_bt_mode_t mode;					/**< BT mode */
-	esp_bt_mode_t controller;			/**< BT mode */
-	esp_blufi_callbacks_t callbacks;	/**< BT mode */
-	/*@}*/
-} ath_bt_config_s;
 
 /**
  * @brief Creates a default wifi configuration.
  */
-static void ath_bt_gblconfig_create(ath_bt_config_s* config) {
+static void ath_bt_config_create(ath_bt_config_s* config) {
 	esp_bt_controller_config_t _defaults = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
 	config->config = _defaults;
 }
 
 /**
  * @brief
+ *
+ * @details
+ *
+ * @param[in] config Pointer to the bluetooth configuration from the context.
  */
-esp_err_t ath_bt_initi(ath_bt_config_s* config);
+esp_err_t ath_bt_initi(ath_bt_config_s* bt);
+
+/**
+ * @brief
+ */
+static esp_err_t ath_bt_init_bluefi(ath_bt_config_s* bt) {
+	esp_err_t err = esp_bt_controller_mem_release(bt->mode);
+	if(err != ESP_OK)return err;
+
+	err = esp_bt_controller_init(&bt->config);
+	if(err != ESP_OK)return err;
+
+	err = esp_bt_controller_enable(bt->controller);
+	if(err != ESP_OK)return err;
+
+	//ATH_BLU_INFO("Blufi API version %04x\n", esp_blufi_get_version());
+	ATH_APP_INFO("Bluetooth initialized in blufi mode.");
+	return -1;
+}
+
+/**
+ * @brief
+ */
+static esp_err_t ath_bt_init_ble(ath_bt_config_s* bt) {
+	return -1;
+}
 
 #endif /* ATH_BLUETOOTH_H_ */

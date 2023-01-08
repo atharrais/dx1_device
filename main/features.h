@@ -31,8 +31,6 @@
 #include <stdbool.h>
 #include <unistd.h>
 
-
-
 /**
  * @brief
  *

@@ -21,12 +21,12 @@
  */
 
 /**
- *
+ * @brief wifi.c
  */
 
 #include "wifi.h"
 
-esp_err_t ath_wifi_initi(wifi_init_config_t* config, wifi_mode_t mode) {
+esp_err_t ath_wifi_initi(ath_wifi_config_s* wifi) {
 	ATH_APP_INFO("Wifi initializing...");
 	esp_err_t err = esp_netif_init();
 
@@ -44,9 +44,9 @@ esp_err_t ath_wifi_initi(wifi_init_config_t* config, wifi_mode_t mode) {
 	err = esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &ip_event_handler, NULL);
 	if(err != ESP_OK) return err;
 
-	err = esp_wifi_init(config);
+	err = esp_wifi_init(&wifi->config);
 
-	switch(mode) {
+	switch(wifi->mode) {
 	case WIFI_MODE_STA:
 		return ath_wifi_start_sta();
 	case WIFI_MODE_AP:

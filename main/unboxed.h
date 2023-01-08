@@ -27,15 +27,13 @@
 #ifndef ATH_UNBOXED_H_
 #define ATH_UNBOXED_H_
 
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/event_groups.h"
-
+#include "globals.h"
 #include "logging.h"
+#include "bluetooth.h"
 #include "wifi.h"
 
-#include "globals.h"
 
+esp_err_t ath_app_unbox_init(ath_context_s* context);
 
 
 #endif /* ATH_UNBOXED_H_ */

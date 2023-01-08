@@ -32,6 +32,7 @@
 #define ATH_STORAGE_H_
 
 #include <stdint.h>
+
 #include "esp_system.h"
 #include "nvs_flash.h"
 #include "nvs.h"

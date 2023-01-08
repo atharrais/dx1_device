@@ -26,23 +26,12 @@
 
 #include "bluetooth.h"
 
-esp_err_t ath_bt_initi(ath_bt_config_s* config) {
+esp_err_t ath_bt_initi(ath_bt_config_s* bt) {
 	ATH_APP_INFO("Bluetooth initializing...");
-
-	esp_err_t err = esp_bt_controller_mem_release(config->mode);
-	if(err != ESP_OK)return err;
-
-	err = esp_bt_controller_init(&config->config);
-	if(err != ESP_OK)return err;
-
-	err = esp_bt_controller_enable(config->controller);
-	if(err != ESP_OK)return err;
-
-	err = esp_blufi_host_and_cb_init(&config->callbacks);
-	if(err != ESP_OK)return err;
-
-	ATH_BLU_INFO("Blufi API version %04x\n", esp_blufi_get_version());
-	ATH_APP_INFO("Bluetooth initialized.");
-
-	return ESP_OK;
+	switch(bt->device_mode) {
+	case ATH_BT_MODE_BLUFI:
+		return ath_bt_init_bluefi(bt);
+	default:
+		return ath_bt_init_ble(bt);
+	}
 }

@@ -24,17 +24,9 @@
  * @brief main.c
  */
 
-#include <stdio.h>
-#include <stdbool.h>
-#include <unistd.h>
-
-#include "storage.h"
-#include "features.h"
-
-#include "unboxed.h"
-
-#include "logging.h"
 #include "globals.h"
+#include "logging.h"
+#include "unboxed.h"
 
 /**
  * @brief Starting the application.
@@ -53,21 +45,21 @@ void app_main(void) {
 		.error = ESP_OK
 	};
 	ath_storage_open(&_storage);
-	ath_storage_getFeatureFlags(&_storage, &ATH_APP_CONTEXT->featureFlags);
+	ath_storage_getFeatureFlags(&_storage, &ATH_APP_CONTEXT->fflags);
 	if(_storage.error == ESP_ERR_NVS_NOT_FOUND) {
 		ATH_APP_ERROR("No flags in NVS, creating new.");
-		ath_storage_setFeatureFlags(&_storage, ATH_APP_CONTEXT->featureFlags);
+		ath_storage_setFeatureFlags(&_storage, ATH_APP_CONTEXT->fflags);
 		ESP_ERROR_CHECK(_storage.error);
 	}
 	else ESP_ERROR_CHECK(_storage.error);
 	ath_storage_close(&_storage);
 
-	if(ath_features_isConfigured(ATH_APP_CONTEXT->featureFlags)) {
+	if(ath_features_isConfigured(ATH_APP_CONTEXT->fflags)) {
+		ATH_APP_INFO("DX-1 boot.");
 		// Start up the app as normal.
 	}
 	else {
-		ATH_APP_INFO("First time boot, setting up unboxed applet.");
-		//ath_wifi_gblconfig_create(&ATH_APP_CONTEXT->wifi);
-
+		ATH_APP_INFO("First time boot.");
+		ESP_ERROR_CHECK(ath_app_unbox_init(ATH_APP_CONTEXT));
 	}
 }

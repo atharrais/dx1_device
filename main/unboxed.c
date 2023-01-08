@@ -25,3 +25,17 @@
  */
 
 #include "unboxed.h"
+
+esp_err_t ath_app_unbox_init(ath_context_s* context) {
+	ath_bt_config_create(&context->bt);
+	ath_wifi_config_create(&context->wifi);
+
+	context->bt.mode = ATH_BT_MODE_BLUFI;
+	context->wifi.mode = WIFI_MODE_STA;
+
+	esp_err_t err = ath_bt_initi(&context->bt);
+	if(err != ESP_OK) return err;
+	err = ath_wifi_initi(&context->wifi);
+
+	return err;
+}
